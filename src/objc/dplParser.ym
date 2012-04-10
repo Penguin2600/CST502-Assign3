@@ -23,7 +23,6 @@ int pop() {
 	return jumpStack[top--]; 
 }
 
-// JMP Stack Stuff
 %}
 
 
@@ -57,10 +56,10 @@ stmtl:   stmt NEWLINE              //{ printf("stmtl: stmt\n");}
 
 
 stmt:    ID ASSIGN expr                 { strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $1);}
-       | READ ID                        { strcpy(stmt[++curLine], "READ\nSTOR ");strcat(stmt[curLine], $2);}
+       | READ ID                        { strcpy(stmt[++curLine], "READ");strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $2);}
        | PRINT ID                       { strcpy(stmt[++curLine], "PRINT");}
-       | WHILE                          { strcpy(stmt[++curLine], "===DOWHILE=="); } 
-         LPAREN expr RPAREN stmt        { strcpy(stmt[++curLine], "===ENDWHILE==");}
+       | WHILE                          { strcpy(stmt[++curLine], "===DOWHILE=="); push(curLine+1)} 
+         LPAREN expr RPAREN stmt        { strcpy(stmt[++curLine], "===ENDWHILE=="); printf("%d\n",pop())}
        | IF LPAREN expr RPAREN stmt
        | LBRACE NEWLINE stmtl RBRACE
 ;
@@ -71,9 +70,9 @@ expr:    ID                     { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[c
        | expr MINUS expr        { strcpy(stmt[++curLine], "SUB");}
        | expr STAR expr         { strcpy(stmt[++curLine], "MUL");}
        | expr SLASH expr        { strcpy(stmt[++curLine], "DIV");}
-       | expr GT expr           { strcpy(stmt[++curLine], "TGT\nJT ");}
-       | expr LT expr           { strcpy(stmt[++curLine], "TLT\nJT ");}
-       | expr EQ expr           { strcpy(stmt[++curLine], "TEQ\nJT ");}
+       | expr GT expr           { strcpy(stmt[++curLine], "TGT");strcpy(stmt[++curLine], "JT ");}
+       | expr LT expr           { strcpy(stmt[++curLine], "TLT");strcpy(stmt[++curLine], "JT ");}
+       | expr EQ expr           { strcpy(stmt[++curLine], "TEQ");strcpy(stmt[++curLine], "JT ");}
        | LPAREN expr RPAREN     						  
 ;
 /* End of grammar */

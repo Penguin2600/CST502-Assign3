@@ -31,6 +31,8 @@
       <delete file="${src.dir}/dplParser.tab.h" failonerror="false"/>
       <delete file="${src.dir}/dplParser.tab.m" failonerror="false"/>
       <delete file="${src.dir}/dplScanner.m" failonerror="false"/>
+      <delete file="${src.dir}/*~" failonerror="false"/>
+      <delete file="${basedir}/*~" failonerror="false"/>
       <delete dir="${dist.dir}" failonerror="false"/>
    </target>
 
