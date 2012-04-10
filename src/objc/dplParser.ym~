@@ -10,6 +10,7 @@
 
 %{
 #include <math.h>  /* Math functions-more for possible extensions than needed*/
+#include <stdio.h> 
 #define MAX_CHARS 255
 #define MAX_STATEMENTS 255
 char * stmt[MAX_STATEMENTS][MAX_CHARS];
@@ -58,8 +59,8 @@ stmtl:   stmt NEWLINE              //{ printf("stmtl: stmt\n");}
 stmt:    ID ASSIGN expr                 { strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $1);}
        | READ ID                        { strcpy(stmt[++curLine], "READ");strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $2);}
        | PRINT ID                       { strcpy(stmt[++curLine], "PRINT");}
-       | WHILE                          { strcpy(stmt[++curLine], "===DOWHILE=="); push(curLine)} 
-         LPAREN expr RPAREN stmt        { strcpy(stmt[++curLine], "===ENDWHILE=="); printf("%d\n",pop())}
+       | WHILE                          { push(curLine);push(curLine);} //Push expected position of our exit Jump and position of our loop Jump
+         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()+5],"JIT %d",curLine+1); sprintf(stmt[++curLine],"JMP %d",pop()+1);} //rewrite exit jump with curLine+1 and write loop jump
        | IF LPAREN expr RPAREN stmt
        | LBRACE NEWLINE stmtl RBRACE
 ;
@@ -70,9 +71,9 @@ expr:    ID                     { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[c
        | expr MINUS expr        { strcpy(stmt[++curLine], "SUB");}
        | expr STAR expr         { strcpy(stmt[++curLine], "MUL");}
        | expr SLASH expr        { strcpy(stmt[++curLine], "DIV");}
-       | expr GT expr           { strcpy(stmt[++curLine], "TGT");strcpy(stmt[++curLine], "JT ");}
-       | expr LT expr           { strcpy(stmt[++curLine], "TLT");strcpy(stmt[++curLine], "JT ");}
-       | expr EQ expr           { strcpy(stmt[++curLine], "TEQ");strcpy(stmt[++curLine], "JT ");}
+       | expr GT expr           { strcpy(stmt[++curLine], "TGT");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
+       | expr LT expr           { strcpy(stmt[++curLine], "TLT");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
+       | expr EQ expr           { strcpy(stmt[++curLine], "TEQ");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
        | LPAREN expr RPAREN     						  
 ;
 /* End of grammar */
@@ -94,6 +95,7 @@ main (argc, argv)
    int x = 0;
    for(x = 0; x <= curLine; x++) {
       strcat(stmt[x], "\n");
+      printf("%d ",x);
       printf(stmt[x]);
    } 
 }
