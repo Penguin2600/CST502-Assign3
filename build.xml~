@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<project name="Cst502: Bison and Flex working together with Objective-C"
+         default="targets" basedir="."
+         xmlns:dn="antlib:org.apache.ant.dotnet"
+         xmlns="antlib:org.apache.tools.ant"
+         xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
+
+   <property name="src.dir" value="src/objc"/>
+   <property name="dist.dir" value="obj"/>
+   <property name="program" value="dplParser"/>
+   <property environment="env"/>
+   <property name="user" value="${env.USERNAME}"/>
+
+   <target name="targets">
+      <echo message="Targets are clean, prepare, build, and targets"/>
+      <echo message="After build, execute (for example): ./obj/mfcalcObjCMac"/>
+      <echo message="Or, ./obj/mfcalcObjCMac testExps.txt"/>
+      <echo message="basedir is: ${basedir}"/>
+      <echo message="os is: ${os.name}"/>
+   </target>
+
+   <path id="compile.classpath">
+      <pathelement location="${build}"/>
+   </path>
+
+   <target name="prepare">
+      <mkdir dir="${dist.dir}" />
+   </target>
+
+   <target name="clean">
+      <delete file="${src.dir}/dplParser.tab.h" failonerror="false"/>
+      <delete file="${src.dir}/dplParser.tab.m" failonerror="false"/>
+      <delete file="${src.dir}/dplScanner.m" failonerror="false"/>
+      <delete dir="${dist.dir}" failonerror="false"/>
+   </target>
+
+   <target name="flexNbison" depends="prepare">
+         <exec dir="${src.dir}"
+               executable="bison">
+           <arg line="-d dplParser.ym"/>
+         </exec>
+         <move file="${src.dir}/dplParser.tab.hm"
+               tofile="${src.dir}/dplParser.tab.h"/>
+         <move file="${src.dir}/dplParser.tab.cm"
+               tofile="${src.dir}/dplParser.tab.m"/>
+         <exec dir="${src.dir}"
+               executable="flex">
+           <arg line="-odplScanner.m dplScanner.flex"/>
+         </exec>
+   </target>
+
+   <target name="build" depends="flexNbison">
+         <exec osfamily="unix"
+               executable="make">
+         </exec>
+         <exec osfamily="mac"
+               executable="./xcruncmd">
+         </exec>
+   </target>
+
+</project>
+
+

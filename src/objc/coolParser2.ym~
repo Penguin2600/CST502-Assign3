@@ -1,0 +1,89 @@
+/**
+ * Purpose: This is an input file for bison defining the syntax and actions
+ * to generate code for simple assignments.
+ * Flex recognizes tokens and parser
+ * places identifiers into the symbol table if they are not already there.
+ * see http://pooh.poly.asu.edu/Cst502
+ * @author Tim Lindquist (Tim.Lindquist@asu.edu), ASU Polytechnic, Engineering
+ * @version April 2011
+ */
+%{
+#include <math.h>  /* Math functions-more for possible extensions than needed*/
+#import "SymbolTable.h"  /* Contains definition of the symboltable */
+#import "STEntry.h"  /* Contains definition of the symbol table entries */
+SymbolTable *aST;
+%}
+/* define the types that are returned by the lexical analyzer. */
+%union {
+int val;  /* For returning numbers. */
+char *string;   /* For returning symbol-table variable identifier strings */
+}
+/* define the tokens to be returned by flex. */
+%token LPAREN RPAREN ASSIGN SEMI LBRACE RBRACE IF WHILE PLUS MINUS STAR SLASH GT LT EQ READ PRINT
+%token <val>  ADOUBLE       /* Simple double precision number */
+%type <string> expr
+%token <string> ID   /* Variable and type identifiers */
+/* %type  <val>  expr */
+
+
+/* %right ASSIGN */
+/* %right IF WHILE */
+/* %left DOT */
+
+/* precendence order: parenthesis, *,/, +,-,assign */
+%left PLUS MINUS
+%left STAR SLASH
+%left LPAREN RPAREN
+
+%%
+/* Grammar - the grammar is ambiguous and would cause conflicts without
+   precedence and associativity defined above. */
+
+
+stmt:    ID ASSIGN expr                    { printf("ASSIGN %s\n",$3);}
+       | WHILE { printf("while\n");} LPAREN expr RPAREN { printf("do\n");}stmt { printf("done\n");}
+       | LBRACE stmtl RBRACE               { printf("{stmtl}\n");}
+       | READ ID                           { printf("READ %s\n", $2);}
+       | PRINT ID                          { printf("PRINT\n");}
+;
+
+stmtl:   stmt                   { printf("stmtl: stmt\n");}
+       | stmt SEMI              { printf("stmtl: stmt SEMI\n");}
+       | stmt SEMI stmtl        { printf("stmtl: stmt SEMI stmtl\n");}
+;
+
+expr:    LPAREN expr RPAREN     { printf("(expr)\n");}
+       | ID                     { printf("PUSH  %s\n" ,$1);}
+       | ADOUBLE                { printf("PUSH  %d\n" ,$1);}
+       | expr PLUS expr         { printf("ADD\n");}
+       | expr MINUS expr        { printf("SUB\n");}
+       | expr STAR expr         { printf("MUL\n");}
+       | expr SLASH expr        { printf("DIV\n");}
+       | expr GT expr           { printf("GT\n",$1, $3);}
+       | expr LT expr           { printf("LT\n",$1, $3);}
+       | expr EQ expr           { printf("EQ\n",$1, $3);}								  
+;
+/* End of grammar */
+%%
+#include <stdio.h>
+
+extern FILE *yyin; /* allows input from file */
+main (argc, argv)
+   int argc;
+   char **argv; {
+   ++argv, --argc;  /* skip over program name */
+   if (argc > 0){   /* if cmd line arg is file name of input file */
+     yyin = fopen(argv[0], "r");
+   }else{
+     yyin = stdin;
+   }
+   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+   
+   yyparse();
+   [pool release];
+}
+
+yyerror (s)  /* called by yyparse on an error */
+   char *s; {
+   printf ("Error: %s\n",s);
+}

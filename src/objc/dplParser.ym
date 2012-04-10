@@ -1,0 +1,105 @@
+/**
+ * Purpose: This is an input file for bison defining the syntax and actions
+ * to generate code for simple assignments.
+ * Flex recognizes tokens and parser
+ * places identifiers into the symbol table if they are not already there.
+ * see http://pooh.poly.asu.edu/Cst502
+ * @author Tim Lindquist (Tim.Lindquist@asu.edu), ASU Polytechnic, Engineering
+ * @version April 2011
+ */
+
+%{
+#include <math.h>  /* Math functions-more for possible extensions than needed*/
+#define MAX_CHARS 255
+#define MAX_STATEMENTS 255
+char * stmt[MAX_STATEMENTS][MAX_CHARS];
+int jumpStack[255], top = -1, curLine = -1;
+
+void push(int val) {
+	jumpStack[++top] = val;
+}
+
+int pop() {
+	return jumpStack[top--]; 
+}
+
+// JMP Stack Stuff
+%}
+
+
+
+/* define the types that are returned by the lexical analyzer. */
+%union {
+int val;        /* For returning numbers. */
+char *string;   /* For returning identifier strings */
+}
+
+/* define the tokens to be returned by flex. */
+%token LPAREN RPAREN ASSIGN SEMI LBRACE RBRACE IF WHILE PLUS MINUS STAR SLASH GT LT EQ READ PRINT NEWLINE
+
+/* Variable and type identifiers */
+%token <val>  ADOUBLE       
+%type <string> expr
+%token <string> ID         
+
+/* precendence order*/
+%left PLUS MINUS
+%left STAR SLASH
+%left LPAREN RPAREN
+
+%%
+/* Grammar - the grammar is ambiguous and would cause conflicts without
+   precedence and associativity defined above. */
+
+stmtl:   stmt NEWLINE              //{ printf("stmtl: stmt\n");}
+       | stmt NEWLINE stmtl        //{ printf("stmtl: stmt SEMI stmtl\n");}
+;
+
+
+stmt:    ID ASSIGN expr                 { strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $1);}
+       | READ ID                        { strcpy(stmt[++curLine], "READ\nSTOR ");strcat(stmt[curLine], $2);}
+       | PRINT ID                       { strcpy(stmt[++curLine], "PRINT");}
+       | WHILE                          { strcpy(stmt[++curLine], "===DOWHILE=="); } 
+         LPAREN expr RPAREN stmt        { strcpy(stmt[++curLine], "===ENDWHILE==");}
+       | IF LPAREN expr RPAREN stmt
+       | LBRACE NEWLINE stmtl RBRACE
+;
+
+expr:    ID                     { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $1);}
+       | ADOUBLE                { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $1);}
+       | expr PLUS expr         { strcpy(stmt[++curLine], "ADD");}
+       | expr MINUS expr        { strcpy(stmt[++curLine], "SUB");}
+       | expr STAR expr         { strcpy(stmt[++curLine], "MUL");}
+       | expr SLASH expr        { strcpy(stmt[++curLine], "DIV");}
+       | expr GT expr           { strcpy(stmt[++curLine], "TGT\nJT ");}
+       | expr LT expr           { strcpy(stmt[++curLine], "TLT\nJT ");}
+       | expr EQ expr           { strcpy(stmt[++curLine], "TEQ\nJT ");}
+       | LPAREN expr RPAREN     						  
+;
+/* End of grammar */
+%%
+#include <stdio.h>
+
+extern FILE *yyin; /* allows input from file */
+main (argc, argv)
+   int argc;
+   char **argv; {
+   ++argv, --argc;  /* skip over program name */
+   if (argc > 0){   /* if cmd line arg is file name of input file */
+     yyin = fopen(argv[0], "r");
+   }else{
+     yyin = stdin;
+   }
+
+   yyparse();
+   int x = 0;
+   for(x = 0; x <= curLine; x++) {
+      strcat(stmt[x], "\n");
+      printf(stmt[x]);
+   } 
+}
+
+yyerror (s)  /* called by yyparse on an error */
+   char *s; {
+   printf ("Error: %s\n",s);
+}
