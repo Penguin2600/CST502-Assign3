@@ -8,9 +8,6 @@ read x
 read n
 prod=1
 while (n>0){
-   if (n>0){
-       print n
-	   }
    sum=0
    count=x
    while(count>0){

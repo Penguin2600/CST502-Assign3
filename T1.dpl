@@ -8,10 +8,6 @@ read x
 read n
 prod=1
 while (n>0){
-   if (n>0){
-       print n
-       print n
-	   }
    sum=0
    count=x
    while(count>0){
@@ -21,4 +17,6 @@ while (n>0){
    prod = prod * sum
    n = n - 1
 }
-print prod
+if (prod > 0){
+   print prod
+}

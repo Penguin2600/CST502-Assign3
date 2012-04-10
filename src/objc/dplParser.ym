@@ -106,7 +106,8 @@ main (argc, argv)
       printf("%d ",x);              // write line numbers 
       printf(stmt[x]);              // write lines to screen.
       fprintf(stmtFile, stmt[x]);   // write lines to file.
-   } 
+   }   
+   fprintf(stmtFile, "END\n");      // write END statement to file.
    fclose(stmtFile);                // close intermediate statement file.
 }
 
