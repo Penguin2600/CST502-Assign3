@@ -10,7 +10,6 @@ prod=1
 while (n>0){
    if (n>0){
        print n
-       print n
 	   }
    sum=0
    count=x
