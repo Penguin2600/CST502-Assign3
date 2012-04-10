@@ -13,6 +13,7 @@
 #include <stdio.h> 
 #define MAX_CHARS 255
 #define MAX_STATEMENTS 255
+FILE * stmtFile;
 char * stmt[MAX_STATEMENTS][MAX_CHARS];
 int jumpStack[255], top = -1, curLine = -1;
 
@@ -97,12 +98,16 @@ main (argc, argv)
    }
 
    yyparse();
+
    int x = 0;
+   stmtFile=fopen("stmt.int","w"); // open intermediate statement file for write.
    for(x = 0; x <= curLine; x++) {
-      strcat(stmt[x], "\n");
-      printf("%d ",x);
-      printf(stmt[x]);
+      strcat(stmt[x], "\n");        // append newlines
+      printf("%d ",x);              // write line numbers 
+      printf(stmt[x]);              // write lines to screen.
+      fprintf(stmtFile, stmt[x]);   // write lines to file.
    } 
+   fclose(stmtFile);                // close intermediate statement file.
 }
 
 yyerror (s)  /* called by yyparse on an error */
