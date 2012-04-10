@@ -14,7 +14,6 @@
 #define MAX_CHARS 255
 #define MAX_STATEMENTS 255
 FILE * stmtFile;
-char * fileName = NULL;
 char * stmt[MAX_STATEMENTS][MAX_CHARS];
 int jumpStack[255], top = -1, curLine = -1;
 
@@ -61,14 +60,14 @@ stmtl:   stmt NEWLINE              //{ printf("stmtl: stmt\n");}
 stmt:    ID ASSIGN expr                 { strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $1);}
        | READ ID                        { strcpy(stmt[++curLine], "READ");strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $2);}
        | PRINT ID                       { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $2);strcpy(stmt[++curLine], "PRINT");}
-                                        //Push the line of our JIT and target of our JMP
+                                        //Push the line of our JIF and target of our JMP
        | WHILE                          { push(curLine+1);push(curLine+4);} 
-					//rewrite JIT with curLine+1 and write JMP
-         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIT %d",curLine+2); sprintf(stmt[++curLine],"JMP %d",pop());} 
-                                        //Push line of our JIT;
+					//rewrite JIF with curLine+1 and write JMP
+         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIF %d",curLine+2); sprintf(stmt[++curLine],"JMP %d",pop());} 
+                                        //Push line of our JIF;
        | IF                             { push(curLine+4);} 
-                                        //rewrite JIT
-         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIT %d",curLine+1);} 
+                                        //rewrite JIF
+         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIF %d",curLine+1);} 
        | LBRACE NEWLINE stmtl RBRACE
 ;
 
@@ -94,8 +93,6 @@ main (argc, argv)
    ++argv, --argc;  /* skip over program name */
    if (argc > 0){   /* if cmd line arg is file name of input file */
      yyin = fopen(argv[0], "r");
-     fileName = strtok(argv, "."); //get filename - extension
-     printf("%s",fileName);
    }else{
      yyin = stdin;
    }
@@ -103,7 +100,6 @@ main (argc, argv)
    yyparse();
 
    int x = 0;
-   
    stmtFile=fopen("stmt.int","w"); // open intermediate statement file for write.
    for(x = 0; x <= curLine; x++) {
       strcat(stmt[x], "\n");        // append newlines
