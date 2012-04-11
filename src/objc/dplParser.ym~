@@ -80,7 +80,8 @@ expr:    ID                     { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[c
        | expr GT expr           { strcpy(stmt[++curLine], "TGT");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
        | expr LT expr           { strcpy(stmt[++curLine], "TLT");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
        | expr EQ expr           { strcpy(stmt[++curLine], "TEQ");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
-       | LPAREN expr RPAREN     						  
+       | LPAREN expr RPAREN
+       | NEWLINE     						  
 ;
 /* End of grammar */
 %%
@@ -107,7 +108,7 @@ main (argc, argv)
       printf(stmt[x]);              // write lines to screen.
       fprintf(stmtFile, stmt[x]);   // write lines to file.
    }   
-   fprintf(stmtFile, "END\n");   // write lines to file.
+   fprintf(stmtFile, "END\n");      // write END statement to file.
    fclose(stmtFile);                // close intermediate statement file.
 }
 

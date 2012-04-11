@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>/
 %}
 %%
-"^\n$"                {}
 "read"                { return READ; }
 "print"               { return PRINT; }
 "="                   { return ASSIGN; }
@@ -45,8 +44,9 @@
                         return(ID); }
 
 "/*"([^*]|("*"+[^*/]))*"*"+"/\n" { }
+"/*"([^*]|("*"+[^*/]))*"*"+"/"   { }
 
-"\n"                           {return NEWLINE;}
-.                              {}
+"\n"                  {return NEWLINE;}
+.                     {}
 
 %%

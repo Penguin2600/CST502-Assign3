@@ -69,6 +69,7 @@ stmt:    ID ASSIGN expr                 { strcpy(stmt[++curLine], "STOR ");strca
                                         //rewrite JIF
          LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIF %d",curLine+1);} 
        | LBRACE NEWLINE stmtl RBRACE
+       | NEWLINE
 ;
 
 expr:    ID                     { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $1);}

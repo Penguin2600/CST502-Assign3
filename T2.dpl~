@@ -7,18 +7,16 @@
 read x
 read n
 prod=1
-while (n>0){
-   sum=0
-   count=x
-   while(count>0){
-if (prod > 0){
-   print prod
-}
-      sum = sum + 1
-      count = count - 1
-   }
-   prod = prod * sum
-   n = n - 1
-}
-
+pA=x+2+3
+print pA
+mA=x-2-3
+print mA
+ppM=x+2*3
+print ppM
+ppD=x-4/2
+print ppD
+pT=(x-4)/2
+print pT
+npT=((x-4)+2) / 3
+print npT
 

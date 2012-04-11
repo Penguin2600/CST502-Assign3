@@ -7,7 +7,7 @@ STOR prod
 PUSH n
 PUSH 0
 TGT
-JIF 36
+JIF 42
 PUSH 0
 STOR sum
 PUSH x
@@ -15,7 +15,13 @@ STOR count
 PUSH count
 PUSH 0
 TGT
-JIF 27
+JIF 33
+PUSH prod
+PUSH 0
+TGT
+JIF 24
+PUSH prod
+PRINT
 PUSH sum
 PUSH 1
 ADD
@@ -34,10 +40,4 @@ PUSH 1
 SUB
 STOR n
 JMP 6
-PUSH prod
-PUSH 0
-TGT
-JIF 42
-PUSH prod
-PRINT
 END

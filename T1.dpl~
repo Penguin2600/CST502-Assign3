@@ -11,10 +11,14 @@ while (n>0){
    sum=0
    count=x
    while(count>0){
+if (prod > 0){
+   print prod
+}
       sum = sum + 1
       count = count - 1
    }
    prod = prod * sum
    n = n - 1
 }
-print prod
+
+
