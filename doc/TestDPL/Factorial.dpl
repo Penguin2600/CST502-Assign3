@@ -1,0 +1,13 @@
+/* 
+  Sample source code in Simple calculating the factorial of an integer.
+  Author: Tim Lindquist, Dept of Engineering ASU Poly
+  Date: April 1, 2012
+*/
+read x
+i = x
+fact = 1
+while (i > 1){
+   fact = fact * i
+   i = i - 1
+}
+print fact

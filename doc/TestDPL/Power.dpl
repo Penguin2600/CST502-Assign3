@@ -1,0 +1,13 @@
+/* 
+  Sample source code in Simple calculating an integer to a power.
+  Author: Tim Lindquist, Dept of Engineering ASU Poly
+  Date: April 1, 2012
+*/
+read x
+read n
+prod = 1
+while (n > 0){
+   prod = prod * x
+   n = n - 1
+}
+print prod

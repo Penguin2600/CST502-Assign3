@@ -1,0 +1,20 @@
+/* 
+  Sample source code in Simple testing nesting of while's.
+  Convoluted calcualtion of x**n
+  Author: Tim Lindquist, Dept of Engineering ASU Poly
+  Date: April 1, 2012
+*/
+read x
+read n
+prod=1
+while (n>0){
+   sum=0
+   count=x
+   while(count>0){
+      sum = sum + 1
+      count = count - 1
+   }
+   prod = prod * sum
+   n = n - 1
+}
+print prod

@@ -1,0 +1,22 @@
+READ
+STOR x
+PUSH x
+STOR i
+PUSH 1
+STOR fact
+PUSH i
+PUSH 1
+TGT
+JIF 19
+PUSH fact
+PUSH i
+MUL
+STOR fact
+PUSH i
+PUSH 1
+SUB
+STOR i
+JMP 6
+PUSH fact
+PRINT
+END

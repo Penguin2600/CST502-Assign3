@@ -1,0 +1,8 @@
+/* 
+  Sample source code in Simple calculating summation 1 to integer.
+  Author: Tim Lindquist, Dept of Engineering ASU Poly
+  Date: April 1, 2012
+*/
+read n
+sum = (n * (n + 1))/2
+print sum

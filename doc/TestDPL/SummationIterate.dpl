@@ -1,0 +1,14 @@
+/* 
+  Sample source code in Simple calculating summation 1 to integer.
+  Author: Tim Lindquist, Dept of Engineering ASU Poly
+  Date: April 1, 2012
+*/
+read n
+i = 1
+sum = 0
+x=(n+1)
+while (i<x){
+   sum = sum + i
+   i = i + 1
+}
+print sum

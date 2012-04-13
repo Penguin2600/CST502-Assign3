@@ -1,0 +1,19 @@
+/* 
+  Sample source code in Simple testing nesting of arithmetic expressions.
+  Author: Tim Lindquist, Dept of Engineering ASU Poly
+  Date: April 1, 2012
+*/
+read x
+plusAssoc = x + 2 + 3
+print plusAssoc
+minusAssoc = x - 2 - 3
+print minusAssoc
+precedPlusMult = x + 2 * 3
+print precedPlusMult
+precedMinusDiv = x - 4 / 2
+print precedMinusDiv
+parenTest = (x - 4) / 2
+print parenTest
+nestedParenTest = ((x - 4) + 2) / 3
+print nestedParenTest
+

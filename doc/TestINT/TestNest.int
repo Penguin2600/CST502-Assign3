@@ -1,0 +1,39 @@
+READ
+STOR x
+READ
+STOR n
+PUSH 1
+STOR prod
+PUSH n
+PUSH 0
+TGT
+JIF 36
+PUSH 0
+STOR sum
+PUSH x
+STOR count
+PUSH count
+PUSH 0
+TGT
+JIF 27
+PUSH sum
+PUSH 1
+ADD
+STOR sum
+PUSH count
+PUSH 1
+SUB
+STOR count
+JMP 14
+PUSH prod
+PUSH sum
+MUL
+STOR prod
+PUSH n
+PUSH 1
+SUB
+STOR n
+JMP 6
+PUSH prod
+PRINT
+END

@@ -1,0 +1,53 @@
+READ
+STOR x
+PUSH x
+PUSH 2
+ADD
+PUSH 3
+ADD
+STOR plusAssoc
+PUSH plusAssoc
+PRINT
+PUSH x
+PUSH 2
+SUB
+PUSH 3
+SUB
+STOR minusAssoc
+PUSH minusAssoc
+PRINT
+PUSH x
+PUSH 2
+PUSH 3
+MUL
+ADD
+STOR precedPlusMult
+PUSH precedPlusMult
+PRINT
+PUSH x
+PUSH 4
+PUSH 2
+DIV
+SUB
+STOR precedMinusDiv
+PUSH precedMinusDiv
+PRINT
+PUSH x
+PUSH 4
+SUB
+PUSH 2
+DIV
+STOR parenTest
+PUSH parenTest
+PRINT
+PUSH x
+PUSH 4
+SUB
+PUSH 2
+ADD
+PUSH 3
+DIV
+STOR nestedParenTest
+PUSH nestedParenTest
+PRINT
+END
