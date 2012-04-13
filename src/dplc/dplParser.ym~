@@ -1,0 +1,118 @@
+/**
+ * Purpose: This is an input file for bison defining the syntax and actions
+ * to generate code for simple assignments.
+ * Flex recognizes tokens and parser
+ * places identifiers into the symbol table if they are not already there.
+ * see http://pooh.poly.asu.edu/Cst502
+ * @author Tim Lindquist (Tim.Lindquist@asu.edu), ASU Polytechnic, Engineering
+ * @version April 2011
+ */
+
+%{
+#include <math.h>  /* Math functions-more for possible extensions than needed*/
+#include <stdio.h> 
+#define MAX_CHARS 255
+#define MAX_STATEMENTS 255
+FILE * stmtFile;
+char * stmt[MAX_STATEMENTS][MAX_CHARS];
+int jumpStack[255], top = -1, curLine = -1;
+
+void push(int val) {
+	jumpStack[++top] = val;
+}
+
+int pop() {
+	return jumpStack[top--]; 
+}
+
+%}
+
+
+
+/* define the types that are returned by the lexical analyzer. */
+%union {
+int val;        /* For returning numbers. */
+char *string;   /* For returning identifier strings */
+}
+
+/* define the tokens to be returned by flex. */
+%token LPAREN RPAREN ASSIGN SEMI LBRACE RBRACE IF WHILE PLUS MINUS STAR SLASH GT LT EQ READ PRINT NEWLINE
+
+/* Variable and type identifiers */
+%token <val>  ADOUBLE       
+%type <string> expr
+%token <string> ID         
+
+/* precendence order*/
+%left PLUS MINUS
+%left STAR SLASH
+%left LPAREN RPAREN
+
+%%
+/* Grammar - the grammar is ambiguous and would cause conflicts without
+   precedence and associativity defined above. */
+
+stmtl:   stmt NEWLINE              //{ printf("stmtl: stmt\n");}
+       | stmt NEWLINE stmtl        //{ printf("stmtl: stmt SEMI stmtl\n");}
+;
+
+
+stmt:    ID ASSIGN expr                 { strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $1);}
+       | READ ID                        { strcpy(stmt[++curLine], "READ");strcpy(stmt[++curLine], "STOR ");strcat(stmt[curLine], $2);}
+       | PRINT ID                       { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $2);strcpy(stmt[++curLine], "PRINT");}
+                                        //Push the line of our JIF and target of our JMP
+       | WHILE                          { push(curLine+1);push(curLine+4);} 
+					//rewrite JIF with curLine+1 and write JMP
+         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIF %d",curLine+2); sprintf(stmt[++curLine],"JMP %d",pop());} 
+                                        //Push line of our JIF;
+       | IF                             { push(curLine+4);} 
+                                        //rewrite JIF
+         LPAREN expr RPAREN stmt        { sprintf(stmt[pop()],"JIF %d",curLine+1);} 
+       | LBRACE NEWLINE stmtl RBRACE
+;
+
+expr:    ID                     { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $1);}
+       | ADOUBLE                { strcpy(stmt[++curLine], "PUSH ");strcat(stmt[curLine], $1);}
+       | expr PLUS expr         { strcpy(stmt[++curLine], "ADD");}
+       | expr MINUS expr        { strcpy(stmt[++curLine], "SUB");}
+       | expr STAR expr         { strcpy(stmt[++curLine], "MUL");}
+       | expr SLASH expr        { strcpy(stmt[++curLine], "DIV");}
+       | expr GT expr           { strcpy(stmt[++curLine], "TGT");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
+       | expr LT expr           { strcpy(stmt[++curLine], "TLT");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
+       | expr EQ expr           { strcpy(stmt[++curLine], "TEQ");strcpy(stmt[++curLine], "JUMP PLACEHOLDER");}
+       | LPAREN expr RPAREN
+       | NEWLINE     						  
+;
+/* End of grammar */
+%%
+#include <stdio.h>
+
+extern FILE *yyin; /* allows input from file */
+main (argc, argv)
+   int argc;
+   char **argv; {
+   ++argv, --argc;  /* skip over program name */
+   if (argc > 0){   /* if cmd line arg is file name of input file */
+     yyin = fopen(argv[0], "r");
+   }else{
+     yyin = stdin;
+   }
+
+   yyparse();
+
+   int x = 0;
+   stmtFile=fopen("stmt.int","w"); // open intermediate statement file for write.
+   for(x = 0; x <= curLine; x++) {
+      strcat(stmt[x], "\n");        // append newlines
+      printf("%d ",x);              // write line numbers 
+      printf(stmt[x]);              // write lines to screen.
+      fprintf(stmtFile, stmt[x]);   // write lines to file.
+   }   
+   fprintf(stmtFile, "END\n");      // write END statement to file.
+   fclose(stmtFile);                // close intermediate statement file.
+}
+
+yyerror (s)  /* called by yyparse on an error */
+   char *s; {
+   printf ("Error: %s\n",s);
+}

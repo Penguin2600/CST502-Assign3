@@ -5,16 +5,16 @@
          xmlns="antlib:org.apache.tools.ant"
          xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
 
-   <property name="src.dir" value="src/objc"/>
-   <property name="dist.dir" value="obj"/>
+   <property name="srcObj.dir" value="src/dplc"/>
+   <property name="srcJava.dir" value="src/dplx"/>
+   <property name="java.dir" value="dplx"/>
+   <property name="obj.dir" value="dplc"/>
    <property name="program" value="dplParser"/>
    <property environment="env"/>
    <property name="user" value="${env.USERNAME}"/>
 
    <target name="targets">
-      <echo message="Targets are clean, prepare, build, and targets"/>
-      <echo message="After build, execute (for example): ./obj/mfcalcObjCMac"/>
-      <echo message="Or, ./obj/mfcalcObjCMac testExps.txt"/>
+      <echo message="Targets are clean, prepare, builddplc, and builddplx"/>
       <echo message="basedir is: ${basedir}"/>
       <echo message="os is: ${os.name}"/>
    </target>
@@ -24,38 +24,51 @@
    </path>
 
    <target name="prepare">
-      <mkdir dir="${dist.dir}" />
+      <mkdir dir="${java.dir}" />
+      <mkdir dir="${obj.dir}" />
    </target>
 
    <target name="clean">
-      <delete file="${src.dir}/dplParser.tab.h" failonerror="false"/>
-      <delete file="${src.dir}/dplParser.tab.m" failonerror="false"/>
-      <delete file="${src.dir}/dplScanner.m" failonerror="false"/>
-      <delete dir="${dist.dir}" failonerror="false"/>
+      <delete file="${srcObj.dir}/dplParser.tab.h" failonerror="false"/>
+      <delete file="${srcObj.dir}/dplParser.tab.m" failonerror="false"/>
+      <delete file="${srcObj.dir}/dplScanner.m" failonerror="false"/>
+      <delete dir="${obj.dir}" failonerror="false"/>
+      <delete dir="${java.dir}" failonerror="false"/>
+      <delete dir="obj" failonerror="false"/>
    </target>
 
-   <target name="flexNbison" depends="prepare">
-         <exec dir="${src.dir}"
+   <target name="preCompile" depends="prepare">
+         <exec dir="${srcObj.dir}"
                executable="bison">
            <arg line="-d dplParser.ym"/>
          </exec>
-         <move file="${src.dir}/dplParser.tab.hm"
-               tofile="${src.dir}/dplParser.tab.h"/>
-         <move file="${src.dir}/dplParser.tab.cm"
-               tofile="${src.dir}/dplParser.tab.m"/>
-         <exec dir="${src.dir}"
+         <move file="${srcObj.dir}/dplParser.tab.hm"
+               tofile="${srcObj.dir}/dplParser.tab.h"/>
+         <move file="${srcObj.dir}/dplParser.tab.cm"
+               tofile="${srcObj.dir}/dplParser.tab.m"/>
+         <exec dir="${srcObj.dir}"
                executable="flex">
            <arg line="-odplScanner.m dplScanner.flex"/>
          </exec>
    </target>
 
-   <target name="build" depends="flexNbison">
+   <target name="builddplx" depends="prepare">
+         <javac srcdir="${srcJava.dir}"
+             includeantruntime="false"
+             destdir="${java.dir}">
+             <classpath refid="compile.classpath"/>
+         </javac>
+   </target>
+   <target name="builddplc" depends="preCompile">
          <exec osfamily="unix"
                executable="make">
          </exec>
          <exec osfamily="mac"
                executable="./xcruncmd">
          </exec>
+         <move file="obj/dplc"
+               tofile="${obj.dir}/dplc"/>
+         <delete dir="obj" failonerror="false"/>
    </target>
 
 </project>
